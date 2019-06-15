@@ -2,6 +2,7 @@
 #define SDL_DRAWER_HPP
 
 #include <SDL.h>
+#include <vector>
 #include "map.hpp"
 #include "path.hpp"
 
@@ -18,14 +19,11 @@ public:
 	SDL_drawer &operator=(const SDL_drawer &drawer);
 
 	// todo keep if interface or delete if factory
-	void initialize(const Map * map);
+	void initialize(const Map & map, int x_min, int x_max, int y_min, int y_max);
 	
 	void draw_map() const; 
 	
 	void draw_path(const Path & path) const; 
-	
-	// draw path
-	//void dessineLigne(float x1, float y1, float x2, float y2) const override;
 
 	void wait_key() const;
 
@@ -37,15 +35,18 @@ private:
     
 	int width;
 	int height;
-	SDL_Window *window;
-	SDL_Renderer *renderer;
-	const Map * map;
+	SDL_Window * window;
+	SDL_Renderer * renderer;
+	vector<int> positions_x;
+	vector<int> positions_y;
 
-	void draw_line(int x1, int y1, int x2, int y2) const;
+	int linear_scaling(int x, int min_x, int max_x, int min_val, int max_val) const;
+
+	void draw_line(int x1, int y1, int x2, int y2, int r, int g, int b) const;
 	
-	void draw_city(const City & city) const;
+	void draw_city(int city_index) const;
 	
-	void draw_path_city(const City & city1, const City & city2) const; 
+	void draw_path_city(int city_index1, int city_index2) const; 
 
 };
 
