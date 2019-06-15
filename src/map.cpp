@@ -5,6 +5,10 @@ Map::Map(vector<City> cities) : cities(cities) {
 		
 }
 
+Map::Map(const Map &map) : cities(map.cities) {
+	
+}
+
 Map Map::random(int n, int xmin, int xmax, int ymin, int ymax) {
 	vector<City> cities;
 	mt19937 generator(random_device{}());

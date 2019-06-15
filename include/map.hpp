@@ -13,6 +13,8 @@ public:
 
 	Map(vector<City> cities);
 	
+	Map(const Map &map);
+	
 	static Map random(int n, int xmin, int xmax, int ymin, int ymax);
 	
 	int number_cities() const;

@@ -18,11 +18,11 @@ public:
 	SDL_drawer &operator=(const SDL_drawer &drawer);
 
 	// todo keep if interface or delete if factory
-	void initialize();
-
-	void draw_map(const Map & map) const; 
+	void initialize(const Map * map);
 	
-	void draw_path(const Map & map, const Path & path) const; 
+	void draw_map() const; 
+	
+	void draw_path(const Path & path) const; 
 	
 	// draw path
 	//void dessineLigne(float x1, float y1, float x2, float y2) const override;
@@ -39,6 +39,7 @@ private:
 	int height;
 	SDL_Window *window;
 	SDL_Renderer *renderer;
+	const Map * map;
 
 	void draw_line(int x1, int y1, int x2, int y2) const;
 	

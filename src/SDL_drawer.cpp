@@ -5,7 +5,8 @@ SDL_drawer::SDL_drawer(int width, int height) :
 	width(width),
 	height(height),
 	window(nullptr),
-	renderer(nullptr) { 
+	renderer(nullptr),
+	map(nullptr) { 
 		
 }
 
@@ -13,7 +14,8 @@ SDL_drawer::SDL_drawer(const SDL_drawer &drawer) :
 	width(drawer.width),
 	height(drawer.height),
 	window(drawer.window),
-	renderer(drawer.renderer) {
+	renderer(drawer.renderer),
+	map(drawer.map) {
 
 }
 
@@ -24,6 +26,7 @@ SDL_drawer & SDL_drawer::operator=(const SDL_drawer &drawer) {
 		swap(height, tmp.height);
 		swap(window, tmp.window);
 		swap(renderer, tmp.renderer);
+		swap(map, tmp.map);
 	}
 	return *this;
 }
@@ -33,7 +36,7 @@ SDL_drawer::~SDL_drawer() {
 	SDL_DestroyWindow(window);
 };
 
-void SDL_drawer::initialize() {
+void SDL_drawer::initialize(const Map * map) {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		throw std::runtime_error("SDL could not be initialized: " + string(SDL_GetError()));
 	}
@@ -52,6 +55,7 @@ void SDL_drawer::initialize() {
 	if (renderer == nullptr) {
 		throw std::runtime_error("Renderer could not be created: " + string(SDL_GetError()));
 	}
+	this->map = map;
 	clean();
 }
 
@@ -72,15 +76,15 @@ void SDL_drawer::draw_path_city(const City & city1, const City & city2) const {
 	draw_line(city1.getX(), city1.getY(), city2.getX(), city2.getY());
 }
 
-void SDL_drawer::draw_map(const Map & map) const {
-	for (int i = 0; i < map.number_cities(); i++) {
-		draw_city(map[i]);
+void SDL_drawer::draw_map() const {
+	for (int i = 0; i < map->number_cities(); i++) {
+		draw_city((*map)[i]);
 	}
 }
 
-void SDL_drawer::draw_path(const Map & map, const Path & path) const {
+void SDL_drawer::draw_path(const Path & path) const {
 	for (int i = 0; i < path.number_cities()-1; i++) {
-		draw_path_city(map[path[i]], map[path[i+1]]);
+		draw_path_city((*map)[path[i]], (*map)[path[i+1]]);
 	}
 }
 
