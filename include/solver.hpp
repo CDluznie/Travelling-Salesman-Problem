@@ -21,6 +21,8 @@ private :
 
 	int fitness(const Path & path) const; // TODO maybe remove
 	
+	Path cross_over(const Path & path1, const Path & path2) const;
+	
 	void mutation(Path & path) const;
 
 	Map map;
