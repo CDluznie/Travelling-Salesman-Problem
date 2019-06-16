@@ -16,8 +16,9 @@ public:
     
     int getY() const;
     
+    int distance(const City & city) const; // TODO maybe squared distance
+    
     //Status_Return_Ville ville_distance (const Ville *v, const Ville *w, int *resultat);
-	
 	
 	// operator== int ville_sont_egale (const Ville *v, const Ville *w);
 	// operator!= int ville_sont_egale (const Ville *v, const Ville *w);

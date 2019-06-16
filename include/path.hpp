@@ -13,9 +13,13 @@ public:
 
 	Path(vector<int> path_order); // Todo private ?
 	
+	Path(const Path &path);
+
+	Path & operator=(const Path &path);
+	
 	static Path random(const Map & map); // TODO maybe in Map
 	
-	// length
+	int distance() const; // TODO maybe in Solver
 	
 	int number_cities() const;
 	

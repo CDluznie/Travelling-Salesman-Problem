@@ -13,9 +13,11 @@ public:
 	
 	explicit Solver(const Map & map);
 	
-	Path get_solution() const;
+	Path get_solution();
 
 private :
+
+	int distance(const Path & path) const; // TODO maybe remove
 
 	Map map;
 	Path path;
