@@ -13,7 +13,7 @@ public:
 
 	Path(vector<int> path_order); // Todo private ?
 	
-	static Path random(const Map & map);
+	static Path random(const Map & map); // TODO maybe in Map
 	
 	// length
 	
