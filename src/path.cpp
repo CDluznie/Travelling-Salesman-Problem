@@ -39,6 +39,10 @@ int Path::operator[](int i) const {
 	return path_order[i];
 }
 
+int & Path::operator[](int i) {
+	return path_order[i];
+}
+
 
 ostream & operator<< (ostream & os, const Path & path) {
 	for (int index : path.path_order) {

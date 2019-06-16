@@ -13,14 +13,19 @@ public:
 	
 	explicit Solver(const Map & map);
 	
-	Path get_solution();
+	void optimize();
+	
+	Path get_solution() const;
 
 private :
 
-	int distance(const Path & path) const; // TODO maybe remove
+	int fitness(const Path & path) const; // TODO maybe remove
+	
+	void mutation(Path & path) const;
 
 	Map map;
-	Path path;
+	
+	vector<Path> population;
 
 };
 

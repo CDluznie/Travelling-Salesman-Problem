@@ -25,6 +25,8 @@ public:
 	
 	int operator[](int i) const;
 	
+	int & operator[](int i);
+	
 	friend ostream & operator<< (ostream & os, const Path & path);
 
 private :

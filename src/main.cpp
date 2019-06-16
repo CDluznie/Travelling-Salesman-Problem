@@ -20,12 +20,12 @@ int main() {
 
 	drawer.initialize(map, x_min, x_max, y_min, y_max);
 	
-	
 	while (!drawer.stop()) {
 		Path path = solver.get_solution();
 		drawer.clean();
 		drawer.draw_path(path);
 		drawer.draw_map();
+		solver.optimize();
 	}
   
     return 0;
