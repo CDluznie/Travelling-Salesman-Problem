@@ -5,7 +5,7 @@
 
 int main() {
 	
-	int number_cities = 10;
+	int number_cities = 100;
 	int x_min = 100, x_max = 999;
 	int y_min = 100, y_max = 999;
 	
@@ -17,21 +17,25 @@ int main() {
 
 	drawer.initialize(map, x_min, x_max, y_min, y_max);
 	
-	drawer.draw_map();
+	while (!drawer.stop()) {
+		drawer.draw_map();
+		
+		//drawer.wait_key();
+		drawer.clean();
+		
+		drawer.draw_path(p1);
+		drawer.draw_map();
+		
+		//drawer.wait_key();
+		drawer.clean();
+		
+		drawer.draw_path(p2);
+		drawer.draw_map();
 	
-	drawer.wait_key();
-	drawer.clean();
+		//drawer.wait_key();
+	}
 	
-	drawer.draw_path(p1);
-	drawer.draw_map();
-	
-	drawer.wait_key();
-	drawer.clean();
-	
-	drawer.draw_path(p2);
-	drawer.draw_map();
-	
-	drawer.wait_key();
+	cout << "fin" << endl;
   
     return 0;
     

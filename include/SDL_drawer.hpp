@@ -24,8 +24,8 @@ public:
 	void draw_map() const; 
 	
 	void draw_path(const Path & path) const; 
-
-	void wait_key() const;
+	
+	bool stop() const;
 
 	void clean() const;
         

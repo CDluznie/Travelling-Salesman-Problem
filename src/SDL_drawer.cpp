@@ -44,7 +44,7 @@ void SDL_drawer::initialize(const Map & map, int x_min, int x_max, int y_min, in
 		throw std::runtime_error("SDL could not be initialized: " + string(SDL_GetError()));
 	}
 	window = SDL_CreateWindow(
-        "travelling salesman problem",
+        "Travelling Salesman Problem",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
         width,
@@ -58,6 +58,7 @@ void SDL_drawer::initialize(const Map & map, int x_min, int x_max, int y_min, in
 	if (renderer == nullptr) {
 		throw std::runtime_error("Renderer could not be created: " + string(SDL_GetError()));
 	}
+	// TODO lambda init
 	for (int i = 0; i < map.number_cities(); i++) {
 		positions_x.push_back(linear_scaling(map[i].getX(), x_min, x_max, 0, width-1));
 		positions_y.push_back(linear_scaling(map[i].getY(), y_min, y_max, 0, height-1));
@@ -99,19 +100,17 @@ void SDL_drawer::draw_path(const Path & path) const {
 	}
 }
 
-void SDL_drawer::wait_key() const {
-	bool done = false;
-	while (!done) {
-		SDL_Event event{};
-		while (SDL_PollEvent(&event)) {
-			if (event.type == SDL_KEYDOWN) {
-				done = true;
-			}
-			if (event.type == SDL_QUIT) { //TODO
-				exit(0);
-			}
-		}	
+bool SDL_drawer::stop() const {
+	SDL_Event event{};
+	bool stop = false;
+	while (SDL_PollEvent(&event)) {
+		if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
+			stop = true;
+		} else if (event.type == SDL_QUIT) {
+			stop = true;
+		}
 	}
+	return stop;
 }
 
 void SDL_drawer::clean() const {
