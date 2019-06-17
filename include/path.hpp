@@ -27,6 +27,10 @@ public:
 	
 	int & operator[](int i);
 	
+	vector<int>::iterator begin();
+	
+	vector<int>::iterator end();
+	
 	friend ostream & operator<< (ostream & os, const Path & path);
 
 private :

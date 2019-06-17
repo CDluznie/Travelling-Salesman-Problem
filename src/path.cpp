@@ -43,6 +43,13 @@ int & Path::operator[](int i) {
 	return path_order[i];
 }
 
+vector<int>::iterator Path::begin() {
+	return path_order.begin();
+}
+
+vector<int>::iterator Path::end() {
+	return path_order.end();
+}
 
 ostream & operator<< (ostream & os, const Path & path) {
 	for (int index : path.path_order) {

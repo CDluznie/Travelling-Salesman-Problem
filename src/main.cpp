@@ -6,7 +6,7 @@
 
 int main() {
 	
-	int number_cities = 20;
+	int number_cities = 50;
 	int x_min = 100, x_max = 999;
 	int y_min = 100, y_max = 999;
 	
