@@ -31,7 +31,9 @@ public:
 	
 	vector<int>::iterator end();
 	
-	friend ostream & operator<< (ostream & os, const Path & path);
+	bool operator==(const Path & path) const;
+	
+	friend ostream & operator<<(ostream & os, const Path & path);
 
 private :
 	

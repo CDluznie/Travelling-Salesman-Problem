@@ -51,6 +51,18 @@ vector<int>::iterator Path::end() {
 	return path_order.end();
 }
 
+bool Path::operator==(const Path & path) const {
+	if (path_order.size() != path.path_order.size()) {
+		return false;
+	}
+	for (unsigned int i = 0; i < path_order.size(); i++) {
+		if (path_order[i] != path.path_order[i]) {
+			return false;
+		}
+	}
+	return true;
+}
+
 ostream & operator<< (ostream & os, const Path & path) {
 	for (int index : path.path_order) {
 		os << index << " ";

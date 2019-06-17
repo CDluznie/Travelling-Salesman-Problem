@@ -37,6 +37,7 @@ SDL_drawer & SDL_drawer::operator=(const SDL_drawer &drawer) {
 SDL_drawer::~SDL_drawer() {
 	SDL_DestroyRenderer(renderer); 
 	SDL_DestroyWindow(window);
+	SDL_Quit();
 };
 
 void SDL_drawer::initialize(const Map & map, int x_min, int x_max, int y_min, int y_max) {
@@ -70,34 +71,35 @@ int SDL_drawer::linear_scaling(int x, int min_x, int max_x, int min_val, int max
 	return min_val + static_cast<int>((max_val - min_val)*(static_cast<float>(x - min_x)/(max_x - min_x)));
 }
 
-void SDL_drawer::draw_line(int x1, int y1, int x2, int y2, int r, int g, int b) const {
-	SDL_SetRenderDrawColor(renderer, r, g, b, 255);
-	SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
-	SDL_RenderPresent(renderer);
-}
-
 void SDL_drawer::draw_city(int city_index) const {
 	int size = 5;
-	int r = 255, g = 0, b = 0;
-	draw_line(positions_x[city_index] - size, positions_y[city_index], positions_x[city_index] + size, positions_y[city_index], r, g, b);
-	draw_line(positions_x[city_index], positions_y[city_index] - size, positions_x[city_index], positions_y[city_index] + size, r, g, b);
+	int x = positions_x[city_index];
+	int y = positions_y[city_index];
+	SDL_RenderDrawLine(renderer, x-size, y, x+size, y);
+	SDL_RenderDrawLine(renderer, x, y-size, x, y+size);
 }
 
 void SDL_drawer::draw_path_city(int city_index1, int city_index2) const {
-	int r = 50, g = 50, b = 255;
-	draw_line(positions_x[city_index1], positions_y[city_index1], positions_x[city_index2], positions_y[city_index2], r, g, b);
+	int x1 = positions_x[city_index1];
+	int y1 = positions_y[city_index1];
+	int x2 = positions_x[city_index2];
+	int y2 = positions_y[city_index2];
+	SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 }
 
 void SDL_drawer::draw_map() const {
+	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 	for (unsigned int i = 0; i < positions_x.size(); i++) {
 		draw_city(i);
 	}
 }
 
 void SDL_drawer::draw_path(const Path & path) const {
+	SDL_SetRenderDrawColor(renderer, 50, 50, 255, 255);
 	for (int i = 0; i < path.number_cities()-1; i++) {
 		draw_path_city(path[i], path[i+1]);
 	}
+	draw_map();
 }
 
 bool SDL_drawer::stop() const {
@@ -117,3 +119,8 @@ void SDL_drawer::clean() const {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 }
+
+void SDL_drawer::update() const {
+	SDL_RenderPresent(renderer);
+}
+

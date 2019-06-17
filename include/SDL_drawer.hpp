@@ -1,7 +1,7 @@
 #ifndef SDL_DRAWER_HPP
 #define SDL_DRAWER_HPP
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <vector>
 #include "map.hpp"
 #include "path.hpp"
@@ -25,14 +25,16 @@ public:
 	
 	void draw_path(const Path & path) const; 
 	
-	bool stop() const;
-
 	void clean() const;
+
+	void update() const;
+	
+	bool stop() const;
         
 	~SDL_drawer();
 
 private:
-    
+
 	int width;
 	int height;
 	SDL_Window * window;
@@ -42,8 +44,6 @@ private:
 
 	int linear_scaling(int x, int min_x, int max_x, int min_val, int max_val) const;
 
-	void draw_line(int x1, int y1, int x2, int y2, int r, int g, int b) const;
-	
 	void draw_city(int city_index) const;
 	
 	void draw_path_city(int city_index1, int city_index2) const; 

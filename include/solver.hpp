@@ -28,7 +28,7 @@ private :
 	Map map;
 	
 	vector<Path> population;
-
+	
 };
 
 #endif

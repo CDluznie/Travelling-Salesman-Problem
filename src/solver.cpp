@@ -35,7 +35,10 @@ Path Solver::cross_over(const Path & path1, const Path & path2) const {
 	int n = path1.number_cities();
 	vector<int> tmp(n);
 	
-	int i = 1;
+	mt19937 generator(random_device{}());
+	int i = uniform_int_distribution<int>(1, n-2)(generator);
+	
+	//i = 1;
 	int premier = tmp[i] = path1[i];
 	int prec = path2[i];
 	while (prec != premier) {
@@ -82,15 +85,17 @@ void Solver::optimize() {
 	vector<Path> childs_population;
 	
 	/*
-	for (int i = 0; i < pop; i++) {
+	int mmm = 80;
+	for (int i = 0; i < mmm; i++) {
 		for (int j = 0; j < i; j++) {
 			childs_population.push_back(cross_over(population[i], population[j]));
 		}
-		for (int j = i+1; j < pop; j++) {
+		for (int j = i+1; j < mmm; j++) {
 			childs_population.push_back(cross_over(population[i], population[j]));
 		}
 	}
 	*/
+	
 	/*
 	for (int i = 0; i < pop; i++) {
 		for (int j = i+1; j < pop; j++) {
