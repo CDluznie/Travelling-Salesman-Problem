@@ -12,16 +12,14 @@ using namespace std;
 class SDL_drawer : public Drawer {
 	
 public:
-
-    explicit SDL_drawer(int width, int height);
         
 	SDL_drawer(const SDL_drawer &drawer);
 
 	SDL_drawer &operator=(const SDL_drawer &drawer);
 	
 	~SDL_drawer();
-
-	void initialize(const Map & map, int x_min, int x_max, int y_min, int y_max) override;
+	
+	static SDL_drawer * create(int width, int height, const Map & map, int x_min, int x_max, int y_min, int y_max);
 	
 	void draw_map() const override;
 	
@@ -42,7 +40,9 @@ private:
 	vector<int> positions_x;
 	vector<int> positions_y;
 
-	int linear_scaling(int x, int min_x, int max_x, int min_val, int max_val) const;
+	SDL_drawer(int width, int height, SDL_Window * window, SDL_Renderer * renderer, vector<int> positions_x, vector<int> positions_y);
+	
+	static int linear_scaling(int x, int min_x, int max_x, int min_val, int max_val);
 
 	void draw_city(int city_index) const;
 	

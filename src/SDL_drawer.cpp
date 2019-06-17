@@ -1,13 +1,13 @@
 #include "SDL_drawer.hpp"
 #include <stdexcept>
 
-SDL_drawer::SDL_drawer(int width, int height) : 
+SDL_drawer::SDL_drawer(int width, int height, SDL_Window * window, SDL_Renderer * renderer, vector<int> positions_x, vector<int> positions_y) : 
 	width(width),
 	height(height),
-	window(nullptr),
-	renderer(nullptr),
-	positions_x(),
-	positions_y() { 
+	window(window),
+	renderer(renderer),
+	positions_x(positions_x),
+	positions_y(positions_y) { 
 		
 }
 
@@ -34,11 +34,11 @@ SDL_drawer & SDL_drawer::operator=(const SDL_drawer &drawer) {
 	return *this;
 }
 
-void SDL_drawer::initialize(const Map & map, int x_min, int x_max, int y_min, int y_max) {
+SDL_drawer * SDL_drawer::create(int width, int height, const Map & map, int x_min, int x_max, int y_min, int y_max) {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		throw std::runtime_error("SDL could not be initialized: " + string(SDL_GetError()));
 	}
-	window = SDL_CreateWindow(
+	SDL_Window * window = SDL_CreateWindow(
         "Travelling Salesman Problem",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
@@ -49,16 +49,21 @@ void SDL_drawer::initialize(const Map & map, int x_min, int x_max, int y_min, in
     if (window == nullptr) {
 		throw std::runtime_error("Window could not be created: " + string(SDL_GetError()));
 	}
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (renderer == nullptr) {
 		throw std::runtime_error("Renderer could not be created: " + string(SDL_GetError()));
 	}
 	// TODO lambda init
+	vector<int> positions_x;
+	vector<int> positions_y;
 	for (int i = 0; i < map.number_cities(); i++) {
 		positions_x.push_back(linear_scaling(map[i].getX(), x_min, x_max, 0, width-1));
 		positions_y.push_back(linear_scaling(map[i].getY(), y_min, y_max, 0, height-1));
 	}
-	clean();
+	//
+	SDL_drawer * drawer = new SDL_drawer(width, height, window, renderer, positions_x, positions_y);
+	drawer->clean();
+	return drawer;
 }
 
 SDL_drawer::~SDL_drawer() {
@@ -67,7 +72,7 @@ SDL_drawer::~SDL_drawer() {
 	SDL_Quit();
 };
 
-int SDL_drawer::linear_scaling(int x, int min_x, int max_x, int min_val, int max_val) const {
+int SDL_drawer::linear_scaling(int x, int min_x, int max_x, int min_val, int max_val) {
 	return min_val + static_cast<int>((max_val - min_val)*(static_cast<float>(x - min_x)/(max_x - min_x)));
 }
 

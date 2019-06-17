@@ -17,9 +17,7 @@ int main() {
 	
 	Path solution = solver.get_solution();
 	
-	Drawer * drawer = new SDL_drawer(900, 650);
-
-	drawer->initialize(map, x_min, x_max, y_min, y_max);
+	Drawer * drawer = Drawer::new_SDL_drawer(900, 650, map, x_min, x_max, y_min, y_max);
 	
 	while (!drawer->stop()) {
 		Path path = solver.get_solution();
