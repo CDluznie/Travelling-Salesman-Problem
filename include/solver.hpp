@@ -11,7 +11,7 @@ class Solver {
 	
 public:	
 	
-	explicit Solver(const Map & map);
+	static Solver * create(const Map & map);
 	
 	void optimize();
 	
@@ -19,11 +19,13 @@ public:
 
 private :
 
-	int fitness(const Path & path) const; // TODO maybe remove
+	Solver(const Map & map, vector<Path> population);
+
+	static int fitness(const Map & map, const Path & path);
 	
-	Path cross_over(const Path & path1, const Path & path2) const;
+	static Path cross_over(const Path & path1, const Path & path2);
 	
-	void mutation(Path & path) const;
+	static void mutation(Path & path);
 
 	Map map;
 	

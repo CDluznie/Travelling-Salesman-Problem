@@ -2,28 +2,26 @@
 #include <algorithm>
 #include <random>
 
-
-#include <random>
-#include <iostream>
-#include <iterator>
-#include <algorithm>
-#include <functional>
-#include <map>
-
-Solver::Solver(const Map & map) : map(map), population() {
-	int population_size = 128;
-	for (int i = 0; i < population_size; i++) {
-		population.push_back(Path::random(map));
-	}
-	
-	
-	sort(population.begin(), population.end(), [this](const Path & p1, const Path & p2) {
-		return fitness(p1) < fitness(p2);
-	});
+Solver::Solver(const Map & map, vector<Path> population) : map(map), population(population) {
 
 }
 
-int Solver::fitness(const Path & path) const {
+Solver * Solver::create(const Map & map) {
+	vector<Path> population;
+	
+	int population_size = 128;
+	
+	
+	for (int i = 0; i < population_size; i++) {
+		population.push_back(Path::random(map));
+	}
+	sort(population.begin(), population.end(), [&map](const Path & p1, const Path & p2) {
+		return fitness(map, p1) < fitness(map, p2);
+	});
+	return new Solver(map, population);
+}
+
+int Solver::fitness(const Map & map, const Path & path) {
 	int d = 0;
 	for (int i = 0; i < path.number_cities()-1; i++) {
 		d += map[path[i]].distance(map[path[i+1]]);
@@ -31,7 +29,7 @@ int Solver::fitness(const Path & path) const {
 	return d;
 }
 
-Path Solver::cross_over(const Path & path1, const Path & path2) const {
+Path Solver::cross_over(const Path & path1, const Path & path2) {
 	int n = path1.number_cities();
 	vector<int> tmp(n);
 	
@@ -61,7 +59,7 @@ Path Solver::cross_over(const Path & path1, const Path & path2) const {
 	return Path(tmp);
 }
 
-void Solver::mutation(Path & path) const {
+void Solver::mutation(Path & path) {
 	mt19937 generator(random_device{}());
 	
 	int n = path.number_cities();
@@ -122,11 +120,12 @@ void Solver::optimize() {
 	
   
 	int pppp = 115;
-	for_each(childs_population.begin(), childs_population.begin()+pppp, [this](Path & p) {
+	for_each(childs_population.begin(), childs_population.begin()+pppp, [](Path & p) {
 		mutation(p);
 	});
+	
 	sort(childs_population.begin(), childs_population.end(), [this](const Path & p1, const Path & p2) {
-		return fitness(p1) < fitness(p2);
+		return fitness(this->map, p1) < fitness(this->map, p2);
 	});
 	
 	
@@ -134,7 +133,7 @@ void Solver::optimize() {
 	int parent_index = 0;
 	int child_index = 0;
 	for (int i = 0; i < pop; i++) {
-		if (fitness(population[parent_index]) < fitness(childs_population[child_index])) {
+		if (fitness(map, population[parent_index]) < fitness(map, childs_population[child_index])) {
 			new_population.push_back(population[parent_index++]);
 		} else {
 			new_population.push_back(childs_population[child_index++]);

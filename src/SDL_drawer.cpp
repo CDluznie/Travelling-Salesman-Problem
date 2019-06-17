@@ -53,12 +53,13 @@ SDL_drawer * SDL_drawer::create(int width, int height, const Map & map, int x_mi
 	if (renderer == nullptr) {
 		throw std::runtime_error("Renderer could not be created: " + string(SDL_GetError()));
 	}
+	int border = 10;
 	// TODO lambda init
 	vector<int> positions_x;
 	vector<int> positions_y;
 	for (int i = 0; i < map.number_cities(); i++) {
-		positions_x.push_back(linear_scaling(map[i].getX(), x_min, x_max, 0, width-1));
-		positions_y.push_back(linear_scaling(map[i].getY(), y_min, y_max, 0, height-1));
+		positions_x.push_back(linear_scaling(map[i].getX(), x_min, x_max, border, width-border-1));
+		positions_y.push_back(linear_scaling(map[i].getY(), y_min, y_max, border, height-border-1));
 	}
 	//
 	SDL_drawer * drawer = new SDL_drawer(width, height, window, renderer, positions_x, positions_y);
@@ -106,7 +107,6 @@ void SDL_drawer::draw_path(const Path & path) const {
 	}
 	draw_map();
 }
-
 
 bool SDL_drawer::stop() const {
 	SDL_Event event{};
