@@ -2,7 +2,11 @@
 #include <algorithm>
 #include <random>
 
-Solver::Solver(const Map & map, vector<Path> population) : map(map), population(population) {
+Solver::Solver(const Map & map, vector<Path> population, int number_path_crossover, int number_path_mutation) :
+	map(map),
+	population(population),
+	number_path_crossover(number_path_crossover),
+	number_path_mutation(number_path_mutation) {
 
 }
 
@@ -10,6 +14,8 @@ Solver * Solver::create(const Map & map) {
 	vector<Path> population;
 	
 	int population_size = 128;
+	float rate_path_crossover = 0.625;
+	float rate_path_mutation = 0.85;
 	
 	
 	for (int i = 0; i < population_size; i++) {
@@ -18,7 +24,7 @@ Solver * Solver::create(const Map & map) {
 	sort(population.begin(), population.end(), [&map](const Path & p1, const Path & p2) {
 		return fitness(map, p1) < fitness(map, p2);
 	});
-	return new Solver(map, population);
+	return new Solver(map, population, population_size*rate_path_crossover, population_size*rate_path_mutation);
 }
 
 int Solver::fitness(const Map & map, const Path & path) {
@@ -49,10 +55,7 @@ Path Solver::cross_over(const Path & path1, const Path & path2) {
 	for (i = 0 ; i < n ; i++) {
 		if (0 == tmp[i])
 			tmp[i] = path2[i];
-		/*
-		else
-			(*fils)->ordre_parcours[i] = tmp[i];
-		*/
+
     }
 	
 	
@@ -76,79 +79,27 @@ void Solver::mutation(Path & path) {
 }
 
 void Solver::optimize() {
-	int pop = population.size();
-
-	
-	
 	vector<Path> childs_population;
-	
-	/*
-	int mmm = 80;
-	for (int i = 0; i < mmm; i++) {
-		for (int j = 0; j < i; j++) {
-			childs_population.push_back(cross_over(population[i], population[j]));
-		}
-		for (int j = i+1; j < mmm; j++) {
-			childs_population.push_back(cross_over(population[i], population[j]));
-		}
+	for (unsigned int i = 0; i <  population.size(); i++) {
+		childs_population.push_back(cross_over(population[(2*i) % number_path_crossover], population[(2*i + 1) % number_path_crossover]));
 	}
-	*/
-	
-	/*
-	for (int i = 0; i < pop; i++) {
-		for (int j = i+1; j < pop; j++) {
-			childs_population.push_back(cross_over(population[i], population[j]));
-		}
-	}
-	*/
-	
-	/*
-	mt19937 generator(random_device{}());
-	for (int i = 0; i < pop; i++) {
-		int a = uniform_int_distribution<int>(0, pop-1)(generator);
-		int b = uniform_int_distribution<int>(0, pop-1)(generator);
-		childs_population.push_back(cross_over(population[a], population[b]));
-	}
-	*/
-	
-	
-	int nn = 80;
-	for (int i = 0; i < pop; i++) {
-		childs_population.push_back(cross_over(population[(2*i) % nn], population[(2*i + 1) % nn]));
-	}
-	
-	
-  
-	int pppp = 115;
-	for_each(childs_population.begin(), childs_population.begin()+pppp, [](Path & p) {
+	for_each(childs_population.begin(), childs_population.begin()+number_path_mutation, [](Path & p) {
 		mutation(p);
 	});
-	
 	sort(childs_population.begin(), childs_population.end(), [this](const Path & p1, const Path & p2) {
 		return fitness(this->map, p1) < fitness(this->map, p2);
 	});
-	
-	
-	vector<Path> new_population;
+	vector<Path> next_population;
 	int parent_index = 0;
 	int child_index = 0;
-	for (int i = 0; i < pop; i++) {
+	for (unsigned int i = 0; i <  population.size(); i++) {
 		if (fitness(map, population[parent_index]) < fitness(map, childs_population[child_index])) {
-			new_population.push_back(population[parent_index++]);
+			next_population.push_back(population[parent_index++]);
 		} else {
-			new_population.push_back(childs_population[child_index++]);
+			next_population.push_back(childs_population[child_index++]);
 		}
 	}
-	
-	
-	
-	/*
-	population.insert(population.end(), childs_population.begin(), childs_population.end());
-	sort(population.begin(), population.end(), [this](const Path & p1, const Path & p2) {
-		return fitness(p1) < fitness(p2);
-	});
-	*/
-	population = vector<Path>(new_population); // TODO avoid copy
+	population = next_population;
 }
 
 Path Solver::get_solution() const {

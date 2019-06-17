@@ -19,17 +19,21 @@ public:
 
 private :
 
-	Solver(const Map & map, vector<Path> population);
+	Solver(const Map & map, vector<Path> population, int number_path_crossover, int number_path_mutation);
 
 	static int fitness(const Map & map, const Path & path);
-	
+
 	static Path cross_over(const Path & path1, const Path & path2);
-	
+
 	static void mutation(Path & path);
 
 	Map map;
-	
+
 	vector<Path> population;
+	
+	int number_path_crossover;
+	
+	int number_path_mutation;
 	
 };
 
