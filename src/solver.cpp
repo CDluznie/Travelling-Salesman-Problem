@@ -1,6 +1,8 @@
 #include "solver.hpp"
 #include <algorithm>
 #include <random>
+#include <set>
+#include <queue>
 
 Solver::Solver(const Map & map, vector<Path> population, int number_path_crossover, int number_path_mutation) :
 	map(map),
@@ -36,46 +38,73 @@ int Solver::fitness(const Map & map, const Path & path) {
 }
 
 Path Solver::cross_over(const Path & path1, const Path & path2) {
-	int n = path1.number_cities();
-	vector<int> tmp(n);
-	
 	mt19937 generator(random_device{}());
-	int i = uniform_int_distribution<int>(1, n-2)(generator);
+	int n = path1.number_cities();
 	
-	//i = 1;
-	int premier = tmp[i] = path1[i];
-	int prec = path2[i];
-	while (prec != premier) {
-		if (path1[i] == prec) {
-			tmp[i] = path1[i];
-			prec = path2[i];
+	
+	/* */
+	Path path = Path(vector<int>(n));
+	int i = uniform_int_distribution<int>(1, n-3)(generator);
+	int j = uniform_int_distribution<int>(i+1, n-2)(generator);
+	
+	set<int> seen;
+	for (int k = i; k <= j; k++) {
+		path[k] = path1[i];
+		seen.insert(path1[i]);
+	}
+	queue<int> not_seen;
+	for (int k = 0; k < n; k++) {
+		if (seen.find(path2[k]) == seen.end()) {
+			not_seen.push(path2[k]);
+		}
+	}
+	
+	for (int k = 0; k < i; k++) {
+		path[k] = not_seen.front();
+		not_seen.pop();
+	}
+	for (int k = i+1; k < n; k++) {
+		path[k] = not_seen.front();
+		not_seen.pop();
+	}
+	
+	/* */
+	
+	
+	/*
+	Path path = Path(vector<int>(n));
+	int i = uniform_int_distribution<int>(1, n-2)(generator);
+	int first = path1[i];
+	int previous = path2[i];
+	path[i] = path1[i];
+	while (previous != first) {
+		if (path1[i] == previous) {
+			path[i] = path1[i];
+			previous = path2[i];
 		}
 		i = (i+1)%n;
 	}
 	for (i = 0 ; i < n ; i++) {
-		if (0 == tmp[i])
-			tmp[i] = path2[i];
-
+		if (path[i] == 0) {
+			path[i] = path2[i];
+		}
     }
-	
-	
-	return Path(tmp);
+	*/
+
+	return path;
 }
 
 void Solver::mutation(Path & path) {
+	// 2-OPT mutation
 	mt19937 generator(random_device{}());
-	
 	int n = path.number_cities();
-	
-	int i = uniform_int_distribution<int>(1, n-3)(generator); //TODO extremities
-	int j = uniform_int_distribution<int>(i+1, n-2)(generator); //TODO extremities
-
+	int i = uniform_int_distribution<int>(1, n-3)(generator);
+	int j = uniform_int_distribution<int>(i+1, n-2)(generator);
 	while (i < j) {
 		swap(path[i], path[j]);
 		i++;
 		j--;
 	}
-
 }
 
 void Solver::optimize() {

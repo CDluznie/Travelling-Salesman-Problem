@@ -23,16 +23,17 @@ Path & Path::operator=(const Path &path) {
 Path Path::random(const Map & map) {
 	vector<int> path_order(map.number_cities());
 	iota(path_order.begin(), path_order.end(), 0);
+	path_order.push_back(0);
 	shuffle(path_order.begin()+1, path_order.end()-1, mt19937{random_device{}()});
 	return Path(path_order);
 }
 
 int Path::distance() const {
-	return 100;
+	return 100; //TODO
 }
 
 int Path::number_cities() const {
-	return path_order.size(); //TODO
+	return path_order.size();
 }
 
 int Path::operator[](int i) const {
