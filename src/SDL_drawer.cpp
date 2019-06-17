@@ -34,12 +34,6 @@ SDL_drawer & SDL_drawer::operator=(const SDL_drawer &drawer) {
 	return *this;
 }
 
-SDL_drawer::~SDL_drawer() {
-	SDL_DestroyRenderer(renderer); 
-	SDL_DestroyWindow(window);
-	SDL_Quit();
-};
-
 void SDL_drawer::initialize(const Map & map, int x_min, int x_max, int y_min, int y_max) {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		throw std::runtime_error("SDL could not be initialized: " + string(SDL_GetError()));
@@ -66,6 +60,12 @@ void SDL_drawer::initialize(const Map & map, int x_min, int x_max, int y_min, in
 	}
 	clean();
 }
+
+SDL_drawer::~SDL_drawer() {
+	SDL_DestroyRenderer(renderer); 
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+};
 
 int SDL_drawer::linear_scaling(int x, int min_x, int max_x, int min_val, int max_val) const {
 	return min_val + static_cast<int>((max_val - min_val)*(static_cast<float>(x - min_x)/(max_x - min_x)));
@@ -102,6 +102,7 @@ void SDL_drawer::draw_path(const Path & path) const {
 	draw_map();
 }
 
+
 bool SDL_drawer::stop() const {
 	SDL_Event event{};
 	bool stop = false;
@@ -123,4 +124,3 @@ void SDL_drawer::clean() const {
 void SDL_drawer::update() const {
 	SDL_RenderPresent(renderer);
 }
-

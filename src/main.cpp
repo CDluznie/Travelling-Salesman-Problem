@@ -2,6 +2,7 @@
 #include "map.hpp"
 #include "path.hpp"
 #include "solver.hpp"
+#include "drawer.hpp"
 #include "SDL_drawer.hpp"
 
 int main() {
@@ -16,17 +17,19 @@ int main() {
 	
 	Path solution = solver.get_solution();
 	
-	SDL_drawer drawer = SDL_drawer(900, 650);
+	Drawer * drawer = new SDL_drawer(900, 650);
 
-	drawer.initialize(map, x_min, x_max, y_min, y_max);
+	drawer->initialize(map, x_min, x_max, y_min, y_max);
 	
-	while (!drawer.stop()) {
+	while (!drawer->stop()) {
 		Path path = solver.get_solution();
-		drawer.clean();
-		drawer.draw_path(path);
-		drawer.update();
+		drawer->clean();
+		drawer->draw_path(path);
+		drawer->update();
 		solver.optimize();
 	}
+	
+	delete drawer;
   
     return 0;
     
