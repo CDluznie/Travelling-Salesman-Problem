@@ -43,10 +43,10 @@ Path Solver::cross_over(const Path & path1, const Path & path2) {
 	
 	
 	/* */
+	// OX crossover
 	Path path = Path(vector<int>(n));
 	int i = uniform_int_distribution<int>(1, n-3)(generator);
 	int j = uniform_int_distribution<int>(i+1, n-2)(generator);
-	
 	set<int> seen;
 	for (int k = i; k <= j; k++) {
 		path[k] = path1[i];
@@ -58,7 +58,6 @@ Path Solver::cross_over(const Path & path1, const Path & path2) {
 			not_seen.push(path2[k]);
 		}
 	}
-	
 	for (int k = 0; k < i; k++) {
 		path[k] = not_seen.front();
 		not_seen.pop();
@@ -67,7 +66,6 @@ Path Solver::cross_over(const Path & path1, const Path & path2) {
 		path[k] = not_seen.front();
 		not_seen.pop();
 	}
-	
 	/* */
 	
 	
