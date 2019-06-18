@@ -21,8 +21,7 @@ public:
 
 private :
 
-	// TODO refactor : * map, map_size, * population, population_size, .....
-	GPU_genetic_solver(const Map & map, int population_size, int number_path_crossover, int number_path_mutation, int2 *dev_map, int *dev_population);
+	GPU_genetic_solver(int2 *dev_map, int map_size, int *dev_population, int population_size, int number_path_crossover, int number_path_mutation);
 
 	static int fitness(const Map & map, const Path & path);
 
@@ -30,7 +29,11 @@ private :
 
 	static void mutation(Path & path);
 
-	Map map;
+	int2 *dev_map;
+
+	int map_size;
+
+	int *dev_population;
 
 	int population_size;
 	
@@ -38,10 +41,6 @@ private :
 	
 	int number_path_mutation;
 	
-	
-	int2 *dev_map;
-	
-	int *dev_population;
 	
 };
 
