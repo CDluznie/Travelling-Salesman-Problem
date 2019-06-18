@@ -4,15 +4,40 @@
 #include <set>
 #include <queue>
 
-GPU_genetic_solver::GPU_genetic_solver(const Map & map, vector<Path> population, int number_path_crossover, int number_path_mutation) :
+#define HANDLE_ERROR(err) (HandleError(err, __FILE__, __LINE__))
+
+static void HandleError(cudaError_t err, const char *file, const int line) {
+	if (err != cudaSuccess) {
+        std::string errMsg = 
+			string(cudaGetErrorString(err)) +
+			" (file:" + string(file) +
+			" at line:" + to_string(line) + ")";
+        throw std::runtime_error(errMsg);
+    }
+}
+
+GPU_genetic_solver::GPU_genetic_solver(const Map & map, vector<Path> population, int number_path_crossover, int number_path_mutation, int2 *dev_map, int *dev_population) :
 	map(map),
 	population(population),
 	number_path_crossover(number_path_crossover),
-	number_path_mutation(number_path_mutation) {
+	number_path_mutation(number_path_mutation),
+	
+	
+	dev_map(dev_map),
+	dev_population(dev_population) {
 
 }
 
 GPU_genetic_solver * GPU_genetic_solver::create(const Map & map, int population_size, float rate_path_crossover, float rate_path_mutation) {
+	int nnn = 10;
+	int2 *dev_map = nullptr;
+	int *dev_population = nullptr; 
+	HANDLE_ERROR(cudaMalloc(&dev_map, map.number_cities() * sizeof(int2)));
+	HANDLE_ERROR(cudaMalloc(&dev_population, nnn * population_size * sizeof(int)));
+	//dev_map[0].x;
+
+
+
 	vector<Path> population;
 	for (int i = 0; i < population_size; i++) {
 		population.push_back(Path::random(map));
@@ -20,7 +45,12 @@ GPU_genetic_solver * GPU_genetic_solver::create(const Map & map, int population_
 	sort(population.begin(), population.end(), [&map](const Path & p1, const Path & p2) {
 		return fitness(map, p1) < fitness(map, p2);
 	});
-	return new GPU_genetic_solver(map, population, population_size*rate_path_crossover, population_size*rate_path_mutation);
+	return new GPU_genetic_solver(map, population, population_size*rate_path_crossover, population_size*rate_path_mutation, dev_map, dev_population);
+}
+
+GPU_genetic_solver::~GPU_genetic_solver() {
+	HANDLE_ERROR(cudaFree(nullptr));
+	HANDLE_ERROR(cudaFree(dev_population));
 }
 
 int GPU_genetic_solver::fitness(const Map & map, const Path & path) {

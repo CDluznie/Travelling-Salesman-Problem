@@ -13,13 +13,15 @@ public:
 	
 	static GPU_genetic_solver * create(const Map & map, int population_size, float rate_path_crossover, float rate_path_mutation);
 	
+	~GPU_genetic_solver();
+	
 	void optimize();
 	
 	Path get_solution() const;
 
 private :
 
-	GPU_genetic_solver(const Map & map, vector<Path> population, int number_path_crossover, int number_path_mutation);
+	GPU_genetic_solver(const Map & map, vector<Path> population, int number_path_crossover, int number_path_mutation, int2 *dev_map, int *dev_population);
 
 	static int fitness(const Map & map, const Path & path);
 
@@ -34,6 +36,11 @@ private :
 	int number_path_crossover;
 	
 	int number_path_mutation;
+	
+	
+	int2 *dev_map;
+	
+	int *dev_population;
 	
 };
 
