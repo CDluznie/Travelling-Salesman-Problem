@@ -1,10 +1,10 @@
-#include "solver.hpp"
+#include "GPU_genetic_solver.hpp"
 #include <algorithm>
 #include <random>
 #include <set>
 #include <queue>
 
-Solver::Solver(const Map & map, vector<Path> population, int number_path_crossover, int number_path_mutation) :
+GPU_genetic_solver::GPU_genetic_solver(const Map & map, vector<Path> population, int number_path_crossover, int number_path_mutation) :
 	map(map),
 	population(population),
 	number_path_crossover(number_path_crossover),
@@ -12,7 +12,7 @@ Solver::Solver(const Map & map, vector<Path> population, int number_path_crossov
 
 }
 
-Solver * Solver::create(const Map & map, int population_size, float rate_path_crossover, float rate_path_mutation) {
+GPU_genetic_solver * GPU_genetic_solver::create(const Map & map, int population_size, float rate_path_crossover, float rate_path_mutation) {
 	vector<Path> population;
 	for (int i = 0; i < population_size; i++) {
 		population.push_back(Path::random(map));
@@ -20,10 +20,10 @@ Solver * Solver::create(const Map & map, int population_size, float rate_path_cr
 	sort(population.begin(), population.end(), [&map](const Path & p1, const Path & p2) {
 		return fitness(map, p1) < fitness(map, p2);
 	});
-	return new Solver(map, population, population_size*rate_path_crossover, population_size*rate_path_mutation);
+	return new GPU_genetic_solver(map, population, population_size*rate_path_crossover, population_size*rate_path_mutation);
 }
 
-int Solver::fitness(const Map & map, const Path & path) {
+int GPU_genetic_solver::fitness(const Map & map, const Path & path) {
 	int d = 0;
 	for (int i = 0; i < path.number_cities()-1; i++) {
 		d += map[path[i]].distance(map[path[i+1]]);
@@ -31,7 +31,7 @@ int Solver::fitness(const Map & map, const Path & path) {
 	return d;
 }
 
-Path Solver::cross_over(const Path & path1, const Path & path2) {
+Path GPU_genetic_solver::cross_over(const Path & path1, const Path & path2) {
 	mt19937 generator(random_device{}());
 	int n = path1.number_cities();
 	
@@ -86,7 +86,7 @@ Path Solver::cross_over(const Path & path1, const Path & path2) {
 	return path;
 }
 
-void Solver::mutation(Path & path) {
+void GPU_genetic_solver::mutation(Path & path) {
 	// 2-OPT mutation
 	mt19937 generator(random_device{}());
 	int n = path.number_cities();
@@ -99,7 +99,7 @@ void Solver::mutation(Path & path) {
 	}
 }
 
-void Solver::optimize() {
+void GPU_genetic_solver::optimize() {
 	vector<Path> childs_population;
 	for (unsigned int i = 0; i <  population.size(); i++) {
 		childs_population.push_back(cross_over(population[(2*i) % number_path_crossover], population[(2*i + 1) % number_path_crossover]));
@@ -123,6 +123,6 @@ void Solver::optimize() {
 	population = next_population;
 }
 
-Path Solver::get_solution() const {
+Path GPU_genetic_solver::get_solution() const {
 	return population[0];
 }

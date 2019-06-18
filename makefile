@@ -1,30 +1,36 @@
+BIN=tsp
+
 SRC=src
 HEADER=include
+OBJDIR=obj
 
 CC=g++
-CFLAGS=-std=c++14 -Wall -Wfatal-errors -Weffc++ -I./$(HEADER) -I/usr/include/SDL2
-LDFLAGS=-lSDL2
+FLAGS=-std=c++14 -Wall -Wfatal-errors -Weffc++
 
-all: main
+NVCC=nvcc
+FLAGS_NVCC=-std=c++14 -gencode=arch=compute_60,code=sm_60 
 
-city.o: $(SRC)/city.cpp $(HEADER)/city.hpp
-map.o: $(SRC)/map.cpp $(HEADER)/map.hpp $(HEADER)/city.hpp
-path.o: $(SRC)/path.cpp $(HEADER)/path.hpp $(HEADER)/map.hpp
-solver.o: $(SRC)/solver.cpp $(HEADER)/solver.hpp $(HEADER)/map.hpp $(HEADER)/path.hpp
-drawer.o: $(SRC)/drawer.cpp $(HEADER)/drawer.hpp $(HEADER)/path.hpp $(HEADER)/map.hpp
-SDL_drawer.o: $(SRC)/SDL_drawer.cpp $(HEADER)/SDL_drawer.hpp $(HEADER)/drawer.hpp $(HEADER)/path.hpp
-main.o: $(SRC)/main.cpp $(HEADER)/map.hpp $(HEADER)/path.hpp $(HEADER)/solver.hpp $(HEADER)/SDL_drawer.hpp
+INC=-I./$(HEADER) -I/usr/include/SDL2 -I/usr/local/cuda/include
+LIBDIR=
+LIBS=-lcuda -lcudart -lSDL2
 
-main: city.o map.o path.o solver.o drawer.o SDL_drawer.o main.o
+OBJECTS=$(OBJDIR)/city.o $(OBJDIR)/map.o $(OBJDIR)/path.o $(OBJDIR)/solver.o $(OBJDIR)/drawer.o $(OBJDIR)/SDL_drawer.o
+OBJECTS_CUDA=$(OBJDIR)/main.cu.o $(OBJDIR)/GPU_genetic_solver.cu.o
 
-%.o: $(SRC)/%.cpp
-	$(CC) $(CFLAGS) -c $<
+all: init $(OBJECTS) $(OBJECTS_CUDA)
+	$(NVCC) $(LIBDIR) $(LIBS) $(FLAGS_NVCC) $(OBJECTS) $(OBJECTS_CUDA) -o $(BIN)
 
-%: %.o
-	$(CC) $^ -o $@ $(LDFLAGS)
+init:
+	mkdir -p $(OBJDIR)
+
+$(OBJDIR)/%.o: $(SRC)/%.cpp
+	$(CC) $(INC) $(FLAGS) -c $< -o $@
+
+$(OBJDIR)/%.cu.o: $(SRC)/%.cu
+	$(NVCC) $(FLAGS_NVCC) $(INC) -c $< -o $@
 
 clean:
-	rm -rf *.o
-	
-mrproper: clean
-	rm -rf main
+	rm -rf $(OBJDIR)
+	rm -f $(BIN)
+
+

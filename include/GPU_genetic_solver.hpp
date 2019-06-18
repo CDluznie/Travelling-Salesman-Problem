@@ -1,5 +1,5 @@
-#ifndef SOLVER_H
-#define SOLVER_H
+#ifndef GPU_GENETIC_SOLVER_H
+#define GPU_GENETIC_SOLVER_H
 
 #include <vector>
 #include "map.hpp"
@@ -7,11 +7,11 @@
 
 using namespace std;
 
-class Solver {
+class GPU_genetic_solver {
 	
 public:	
 	
-	static Solver * create(const Map & map, int population_size, float rate_path_crossover, float rate_path_mutation);
+	static GPU_genetic_solver * create(const Map & map, int population_size, float rate_path_crossover, float rate_path_mutation);
 	
 	void optimize();
 	
@@ -19,7 +19,7 @@ public:
 
 private :
 
-	Solver(const Map & map, vector<Path> population, int number_path_crossover, int number_path_mutation);
+	GPU_genetic_solver(const Map & map, vector<Path> population, int number_path_crossover, int number_path_mutation);
 
 	static int fitness(const Map & map, const Path & path);
 
