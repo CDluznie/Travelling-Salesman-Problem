@@ -16,28 +16,21 @@ static void HandleError(cudaError_t err, const char *file, const int line) {
     }
 }
 
-GPU_genetic_solver::GPU_genetic_solver(const Map & map, vector<Path> population, int number_path_crossover, int number_path_mutation, int2 *dev_map, int *dev_population) :
+GPU_genetic_solver::GPU_genetic_solver(const Map & map, int population_size, int number_path_crossover, int number_path_mutation, int2 *dev_map, int *dev_population) :
 	map(map),
-	population(population),
+	
+	population_size(population_size),
 	number_path_crossover(number_path_crossover),
 	number_path_mutation(number_path_mutation),
-	
-	
 	dev_map(dev_map),
 	dev_population(dev_population) {
 
 }
 
 GPU_genetic_solver * GPU_genetic_solver::create(const Map & map, int population_size, float rate_path_crossover, float rate_path_mutation) {
-	int nnn = 10;
-	int2 *dev_map = nullptr;
-	int *dev_population = nullptr; 
-	HANDLE_ERROR(cudaMalloc(&dev_map, map.number_cities() * sizeof(int2)));
-	HANDLE_ERROR(cudaMalloc(&dev_population, nnn * population_size * sizeof(int)));
-	//dev_map[0].x;
 
-
-
+	
+	/* TODO on GPU */
 	vector<Path> population;
 	for (int i = 0; i < population_size; i++) {
 		population.push_back(Path::random(map));
@@ -45,7 +38,36 @@ GPU_genetic_solver * GPU_genetic_solver::create(const Map & map, int population_
 	sort(population.begin(), population.end(), [&map](const Path & p1, const Path & p2) {
 		return fitness(map, p1) < fitness(map, p2);
 	});
-	return new GPU_genetic_solver(map, population, population_size*rate_path_crossover, population_size*rate_path_mutation, dev_map, dev_population);
+	/*          */
+
+
+
+	int path_length = map.number_cities()+1;
+	
+	// Create map on GPU
+	vector<int2> host_map;
+	for (int i = 0; i < map.number_cities(); i++) {
+		City city = map[i];
+		host_map.push_back(int2 {city.getX(), city.getY()});
+	}
+	int2 *dev_map = nullptr;
+	HANDLE_ERROR(cudaMalloc(&dev_map, host_map.size()*sizeof(int2)));
+	HANDLE_ERROR(cudaMemcpy(dev_map, host_map.data(), host_map.size()*sizeof(int2), cudaMemcpyHostToDevice));
+	
+
+	
+	// Create paths on GPU
+	vector<int> host_population;
+	for (int i = 0; i < population_size; i++) {
+		host_population.insert(host_population.end(), population[i].begin(), population[i].end());
+	}
+	int *dev_population = nullptr; 
+	HANDLE_ERROR(cudaMalloc(&dev_population, population_size*path_length*sizeof(int)));
+	HANDLE_ERROR(cudaMemcpy(dev_population, host_population.data(), host_population.size()*sizeof(int), cudaMemcpyHostToDevice));
+	
+
+
+	return new GPU_genetic_solver(map, population_size, population_size*rate_path_crossover, population_size*rate_path_mutation, dev_map, dev_population);
 }
 
 GPU_genetic_solver::~GPU_genetic_solver() {
@@ -130,6 +152,20 @@ void GPU_genetic_solver::mutation(Path & path) {
 }
 
 void GPU_genetic_solver::optimize() {
+	/* TODO RM */
+	/* GPU to HOST */
+	int path_length = map.number_cities()+1;
+	vector<int> host_path_1(population_size*path_length);
+	HANDLE_ERROR(cudaMemcpy(host_path_1.data(), dev_population, host_path_1.size()*sizeof(int), cudaMemcpyDeviceToHost));
+	vector<Path> population;
+	for (int i = 0; i < population_size; i++){
+		auto begin_iter = host_path_1.begin() + i*path_length;
+		Path path(vector<int>(begin_iter, begin_iter + path_length));
+		population.push_back(path);
+	}
+	
+	
+	
 	vector<Path> childs_population;
 	for (unsigned int i = 0; i <  population.size(); i++) {
 		childs_population.push_back(cross_over(population[(2*i) % number_path_crossover], population[(2*i + 1) % number_path_crossover]));
@@ -151,8 +187,22 @@ void GPU_genetic_solver::optimize() {
 		}
 	}
 	population = next_population;
+
+
+	/* TODO RM */
+	/* HOST to GPU */
+	vector<int> host_population_2;
+	for (int i = 0; i < population.size(); i++) {
+		host_population_2.insert(host_population_2.end(), population[i].begin(), population[i].end());
+	}
+	HANDLE_ERROR(cudaMemcpy(dev_population, host_population_2.data(), host_population_2.size()*sizeof(int), cudaMemcpyHostToDevice));
 }
 
 Path GPU_genetic_solver::get_solution() const {
-	return population[0];
+	int path_length = map.number_cities()+1;
+	
+	
+	vector<int> host_path(path_length);
+	HANDLE_ERROR(cudaMemcpy(host_path.data(), dev_population, path_length*sizeof(int), cudaMemcpyDeviceToHost));
+	return Path(host_path);
 }
