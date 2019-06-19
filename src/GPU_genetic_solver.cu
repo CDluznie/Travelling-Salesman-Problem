@@ -1,4 +1,10 @@
 #include "GPU_genetic_solver.hpp"
+
+
+#include <curand.h>
+#include <curand_kernel.h>
+
+
 #include <algorithm>
 #include <random>
 #include <set>
@@ -16,10 +22,11 @@ static void HandleError(cudaError_t err, const char *file, const int line) {
     }
 }
 
-GPU_genetic_solver::GPU_genetic_solver(int2 *dev_map, int map_size, int *dev_population, int population_size, int number_path_crossover, int number_path_mutation) :
+GPU_genetic_solver::GPU_genetic_solver(int2 *dev_map, int map_size, int *dev_population, int *dev_childs_population, int population_size, int number_path_crossover, int number_path_mutation) :
 	dev_map(dev_map),
 	map_size(map_size),
 	dev_population(dev_population),
+	dev_childs_population(dev_childs_population),
 	population_size(population_size),
 	number_path_crossover(number_path_crossover),
 	number_path_mutation(number_path_mutation) {
@@ -63,9 +70,12 @@ GPU_genetic_solver * GPU_genetic_solver::create(const Map & map, int population_
 	int *dev_population = nullptr; 
 	HANDLE_ERROR(cudaMalloc(&dev_population, population_size*path_length*sizeof(int)));
 	HANDLE_ERROR(cudaMemcpy(dev_population, host_population.data(), host_population.size()*sizeof(int), cudaMemcpyHostToDevice));
-	
+	int *dev_childs_population = nullptr; 
+	HANDLE_ERROR(cudaMalloc(&dev_childs_population, population_size*path_length*sizeof(int)));
 
-	return new GPU_genetic_solver(dev_map, map_size, dev_population, population_size, population_size*rate_path_crossover, population_size*rate_path_mutation);
+
+
+	return new GPU_genetic_solver(dev_map, map_size, dev_population, dev_childs_population, population_size, population_size*rate_path_crossover, population_size*rate_path_mutation);
 }
 
 GPU_genetic_solver::~GPU_genetic_solver() {
@@ -81,7 +91,18 @@ int GPU_genetic_solver::fitness(const Map & map, const Path & path) {
 	return d;
 }
 
-Path GPU_genetic_solver::cross_over(const Path & path1, const Path & path2) {
+__global__
+void cross_over(int *dev_population, int *dev_childs_population, int population_size, int path_length) {
+
+	//TODO
+	
+	for (int i = 0; i < population_size*path_length; i++) {
+		dev_childs_population[i] = dev_population[i];
+	}
+	
+}	
+
+Path GPU_genetic_solver::cross_over_tmp(const Path & path1, const Path & path2) {
 	mt19937 generator(random_device{}());
 	int n = path1.number_cities();
 	
@@ -136,7 +157,32 @@ Path GPU_genetic_solver::cross_over(const Path & path1, const Path & path2) {
 	return path;
 }
 
-void GPU_genetic_solver::mutation(Path & path) {
+__global__
+void mutation(int *dev_population, int population_size, int path_length) {
+	
+	
+	for (int path = 0; path < population_size; path++) {
+		
+		
+		int begin_index = (((dev_population[path]*path) << 2) | 784) % (path_length-3) + 1; // TODO random
+		int end_index = (((dev_population[path]*path) << 3) | 993) % (path_length-begin_index-1) + begin_index; // TODO random
+		
+		int i = path*path_length + begin_index;
+		int j = path*path_length + end_index;
+		while (i < j) {
+			//
+			int tmp = dev_population[i];
+			dev_population[i] = dev_population[j];
+			dev_population[j] = tmp;
+			//
+			i++;
+			j--;
+		}
+	}
+	
+}	
+
+void GPU_genetic_solver::mutation_tmp(Path & path) {
 	// 2-OPT mutation
 	mt19937 generator(random_device{}());
 	int n = path.number_cities();
@@ -176,13 +222,36 @@ void GPU_genetic_solver::optimize() {
 	
 	
 	
+	
+	cross_over<<<1,1>>>(dev_population, dev_childs_population, population_size, path_length);
+	mutation<<<1,1>>>(dev_childs_population, number_path_mutation, path_length);
+	
+	
 	vector<Path> childs_population;
+	
+	
+	// CPU child
+	/*
 	for (unsigned int i = 0; i <  population.size(); i++) {
-		childs_population.push_back(cross_over(population[(2*i) % number_path_crossover], population[(2*i + 1) % number_path_crossover]));
+		childs_population.push_back(cross_over_tmp(population[(2*i) % number_path_crossover], population[(2*i + 1) % number_path_crossover]));
 	}
 	for_each(childs_population.begin(), childs_population.begin()+number_path_mutation, [](Path & p) {
-		mutation(p);
+		mutation_tmp(p);
 	});
+	 */
+
+	//GPU child
+	/* */
+	vector<int> childs_population_host(population_size*path_length);
+	HANDLE_ERROR(cudaMemcpy(childs_population_host.data(), dev_childs_population, population_size*path_length*sizeof(int), cudaMemcpyDeviceToHost));
+	for (int i = 0; i < population_size; i++){
+		auto begin_iter = childs_population_host.begin() + i*path_length;
+		Path path(vector<int>(begin_iter, begin_iter + path_length));
+		childs_population.push_back(path);
+	}
+	/* */
+	
+	
 	sort(childs_population.begin(), childs_population.end(), [&map](const Path & p1, const Path & p2) {
 		return fitness(map, p1) < fitness(map, p2);
 	});

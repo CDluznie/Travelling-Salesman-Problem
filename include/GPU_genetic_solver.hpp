@@ -21,19 +21,21 @@ public:
 
 private :
 
-	GPU_genetic_solver(int2 *dev_map, int map_size, int *dev_population, int population_size, int number_path_crossover, int number_path_mutation);
+	GPU_genetic_solver(int2 *dev_map, int map_size, int *dev_population, int *dev_childs_population, int population_size, int number_path_crossover, int number_path_mutation);
 
 	static int fitness(const Map & map, const Path & path);
 
-	static Path cross_over(const Path & path1, const Path & path2);
+	static Path cross_over_tmp(const Path & path1, const Path & path2);
 
-	static void mutation(Path & path);
+	static void mutation_tmp(Path & path);
 
 	int2 *dev_map;
 
 	int map_size;
 
 	int *dev_population;
+	
+	int *dev_childs_population;
 
 	int population_size;
 	
