@@ -6,28 +6,20 @@ OBJDIR=obj
 
 CC=g++
 FLAGS=-std=c++14 -Wall -Wfatal-errors -Weffc++
-
-NVCC=nvcc
-FLAGS_NVCC=-std=c++14 -gencode=arch=compute_60,code=sm_60 
-
-INC=-I./$(HEADER) -I/usr/include/SDL2 -I/usr/local/cuda/include
+INC=-I./$(HEADER) -I/usr/include/SDL2
 LIBDIR=
-LIBS=-lcuda -lcudart -lSDL2
+LIBS=-lSDL2
 
-OBJECTS=$(OBJDIR)/city.o $(OBJDIR)/map.o $(OBJDIR)/path.o $(OBJDIR)/solver.o $(OBJDIR)/drawer.o $(OBJDIR)/SDL_drawer.o
-OBJECTS_CUDA=$(OBJDIR)/main.cu.o $(OBJDIR)/GPU_genetic_solver.cu.o
+OBJECTS=$(OBJDIR)/city.o $(OBJDIR)/map.o $(OBJDIR)/path.o $(OBJDIR)/solver.o $(OBJDIR)/drawer.o $(OBJDIR)/SDL_drawer.o $(OBJDIR)/main.o
 
 all: init $(OBJECTS) $(OBJECTS_CUDA)
-	$(NVCC) $(LIBDIR) $(LIBS) $(FLAGS_NVCC) $(OBJECTS) $(OBJECTS_CUDA) -o $(BIN)
+	$(CC) $(OBJECTS) -o $(BIN) $(LIBDIR) $(LIBS)
 
 init:
 	mkdir -p $(OBJDIR)
 
 $(OBJDIR)/%.o: $(SRC)/%.cpp
 	$(CC) $(INC) $(FLAGS) -c $< -o $@
-
-$(OBJDIR)/%.cu.o: $(SRC)/%.cu
-	$(NVCC) $(FLAGS_NVCC) $(INC) -c $< -o $@
 
 clean:
 	rm -rf $(OBJDIR)
