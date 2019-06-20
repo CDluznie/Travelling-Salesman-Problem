@@ -12,7 +12,7 @@ LIBS=-lSDL2
 
 OBJECTS=$(OBJDIR)/city.o $(OBJDIR)/map.o $(OBJDIR)/path.o $(OBJDIR)/solver.o $(OBJDIR)/drawer.o $(OBJDIR)/SDL_drawer.o $(OBJDIR)/main.o
 
-all: init $(OBJECTS) $(OBJECTS_CUDA)
+all: init $(OBJECTS)
 	$(CC) $(OBJECTS) -o $(BIN) $(LIBDIR) $(LIBS)
 
 init:
