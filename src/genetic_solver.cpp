@@ -32,86 +32,12 @@ int genetic_solver::fitness(const Map & map, const Path & path) {
 }
 
 Path genetic_solver::cross_over(const Path & path1, const Path & path2) {
+	// OX crossover
 	mt19937 generator(random_device{}());
 	int n = path1.number_cities();
-	
-	
-	/* */
-	// OX crossover
-	Path path = Path(vector<int>(n));
 	int i = uniform_int_distribution<int>(1, n-3)(generator);
 	int j = uniform_int_distribution<int>(i+1, n-2)(generator);
-	set<int> seen;
-	for (int k = i; k <= j; k++) {
-		path[k] = path1[k];
-		seen.insert(path1[k]);
-	}
-	
-	/*
-	cerr << "AAA : ";
-	for (int k = 0; k < n; k++)
-		cerr << path[k] << " ";
-	cerr << endl;
-	*/
-	
-	queue<int> not_seen;
-	for (int k = 0; k < n; k++) {
-		if (seen.find(path2[k]) == seen.end()) {
-			not_seen.push(path2[k]);
-		}
-	}
-	
-	
-	for (int k = 0; k < i; k++) {
-		path[k] = not_seen.front();
-		not_seen.pop();
-	}
-
-	/*
-	cerr << "BBB " << i << " : ";
-	for (int k = 0; k < n; k++)
-		cerr << path[k] << " ";
-	cerr << endl;
-	*/
-
-
-
-	for (int k = j+1; k < n; k++) {
-		path[k] = not_seen.front();
-		not_seen.pop();
-	}
-	
-	/*
-	cerr << "CCC " << i << " : ";
-	for (int k = 0; k < n; k++)
-		cerr << path[k] << " ";
-	cerr << endl;
-	*/
-	
-	/* */
-	
-	
-	/*
-	Path path = Path(vector<int>(n));
-	int i = uniform_int_distribution<int>(1, n-2)(generator);
-	int first = path1[i];
-	int previous = path2[i];
-	path[i] = path1[i];
-	while (previous != first) {
-		if (path1[i] == previous) {
-			path[i] = path1[i];
-			previous = path2[i];
-		}
-		i = (i+1)%n;
-	}
-	for (i = 0 ; i < n ; i++) {
-		if (path[i] == 0) {
-			path[i] = path2[i];
-		}
-    }
-	*/
-
-	return path;
+	return path1.crossing(i, j, path2);
 }
 
 void genetic_solver::mutation(Path & path) {
@@ -121,6 +47,20 @@ void genetic_solver::mutation(Path & path) {
 	int i = uniform_int_distribution<int>(1, n-3)(generator);
 	int j = uniform_int_distribution<int>(i+1, n-2)(generator);
 	path.reverse(i,j);
+}
+
+vector<Path> genetic_solver::merge(const Map & map, const vector<Path> & population, const vector<Path> & childs_population) {
+	vector<Path> next_population;
+	int parent_index = 0;
+	int child_index = 0;
+	for (unsigned int i = 0; i <  population.size(); i++) {
+		if (fitness(map, population[parent_index]) < fitness(map, childs_population[child_index])) {
+			next_population.push_back(population[parent_index++]);
+		} else {
+			next_population.push_back(childs_population[child_index++]);
+		}
+	}
+	return next_population;
 }
 
 void genetic_solver::optimize() {
@@ -134,17 +74,7 @@ void genetic_solver::optimize() {
 	sort(childs_population.begin(), childs_population.end(), [this](const Path & p1, const Path & p2) {
 		return fitness(this->map, p1) < fitness(this->map, p2);
 	});
-	vector<Path> next_population;
-	int parent_index = 0;
-	int child_index = 0;
-	for (unsigned int i = 0; i <  population.size(); i++) {
-		if (fitness(map, population[parent_index]) < fitness(map, childs_population[child_index])) {
-			next_population.push_back(population[parent_index++]);
-		} else {
-			next_population.push_back(childs_population[child_index++]);
-		}
-	}
-	population = next_population;
+	population = merge(map, population, childs_population);
 }
 
 Path genetic_solver::get_solution() const {

@@ -25,7 +25,7 @@ public:
 	
 	void reverse(int begin, int end);
 	
-	Path crossing(int begin, int end, const Path & other);
+	Path crossing(int begin, int end, const Path & other) const;
 	
 	int operator[](int i) const;
 	

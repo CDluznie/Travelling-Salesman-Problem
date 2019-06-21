@@ -48,30 +48,29 @@ void Path::reverse(int begin, int end) {
 	}
 }
 
-Path Path::crossing(int begin, int end, const Path & other) {
-	/*
-	Path path = Path(vector<int>(path_order.size()));
+Path Path::crossing(int begin, int end, const Path & other) const {
+	int n = path_order.size();
+	vector<int> new_path = vector<int>(n);
 	set<int> seen;
-	for (int k = i; k <= j; k++) {
-		path[k] = path1[i];
-		seen.insert(path1[i]);
+	for (int i = begin; i <= end; i++) {
+		new_path[i] = path_order[i];
+		seen.insert(path_order[i]);
 	}
 	queue<int> not_seen;
-	for (int k = 0; k < n; k++) {
-		if (seen.find(path2[k]) == seen.end()) {
-			not_seen.push(path2[k]);
+	for (int i = 0; i < n; i++) {
+		if (seen.find(other.path_order[i]) == seen.end()) {
+			not_seen.push(other.path_order[i]);
 		}
 	}
-	for (int k = 0; k < i; k++) {
-		path[k] = not_seen.front();
+	for (int i = 0; i < begin; i++) {
+		new_path[i] = not_seen.front();
 		not_seen.pop();
 	}
-	for (int k = i+1; k < n; k++) {
-		path[k] = not_seen.front();
+	for (int i = end+1; i < n; i++) {
+		new_path[i] = not_seen.front();
 		not_seen.pop();
 	}
-	*/
-	return *this;
+	return Path(new_path);
 }
 
 int Path::operator[](int i) const {

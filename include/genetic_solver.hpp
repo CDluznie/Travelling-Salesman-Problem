@@ -27,6 +27,8 @@ private :
 	static Path cross_over(const Path & path1, const Path & path2);
 
 	static void mutation(Path & path);
+	
+	static vector<Path> merge(const Map & map, const vector<Path> & population, const vector<Path> & childs_population);
 
 	Map map;
 
