@@ -11,13 +11,13 @@ class Solver {
 	
 public:	
 	
-	//TODO factory
-	
 	virtual ~Solver() {};
 	
 	virtual void optimize() = 0;
 	
 	virtual Path get_solution() const = 0;
+	
+	static Solver * new_genetic_solver(const Map & map, int population_size, float rate_path_crossover, float rate_path_mutation);
 
 };
 
