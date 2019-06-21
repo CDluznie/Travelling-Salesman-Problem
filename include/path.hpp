@@ -23,6 +23,10 @@ public:
 	
 	int number_cities() const;
 	
+	void reverse(int begin, int end);
+	
+	Path crossing(int begin, int end, const Path & other);
+	
 	int operator[](int i) const;
 	
 	int & operator[](int i);

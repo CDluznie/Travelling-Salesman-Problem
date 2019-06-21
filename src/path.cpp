@@ -2,6 +2,8 @@
 #include <numeric>
 #include <random>
 #include <algorithm>
+#include <set>
+#include <queue>
 
 Path::Path(vector<int> path_order) : path_order(path_order) {
 		
@@ -34,6 +36,42 @@ int Path::distance() const {
 
 int Path::number_cities() const {
 	return path_order.size();
+}
+
+void Path::reverse(int begin, int end) {
+	int i = begin;
+	int j = end;
+	while (i < j) {
+		swap(path_order[i], path_order[j]);
+		i++;
+		j--;
+	}
+}
+
+Path Path::crossing(int begin, int end, const Path & other) {
+	/*
+	Path path = Path(vector<int>(path_order.size()));
+	set<int> seen;
+	for (int k = i; k <= j; k++) {
+		path[k] = path1[i];
+		seen.insert(path1[i]);
+	}
+	queue<int> not_seen;
+	for (int k = 0; k < n; k++) {
+		if (seen.find(path2[k]) == seen.end()) {
+			not_seen.push(path2[k]);
+		}
+	}
+	for (int k = 0; k < i; k++) {
+		path[k] = not_seen.front();
+		not_seen.pop();
+	}
+	for (int k = i+1; k < n; k++) {
+		path[k] = not_seen.front();
+		not_seen.pop();
+	}
+	*/
+	return *this;
 }
 
 int Path::operator[](int i) const {

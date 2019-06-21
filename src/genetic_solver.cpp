@@ -43,23 +43,51 @@ Path genetic_solver::cross_over(const Path & path1, const Path & path2) {
 	int j = uniform_int_distribution<int>(i+1, n-2)(generator);
 	set<int> seen;
 	for (int k = i; k <= j; k++) {
-		path[k] = path1[i];
-		seen.insert(path1[i]);
+		path[k] = path1[k];
+		seen.insert(path1[k]);
 	}
+	
+	/*
+	cerr << "AAA : ";
+	for (int k = 0; k < n; k++)
+		cerr << path[k] << " ";
+	cerr << endl;
+	*/
+	
 	queue<int> not_seen;
 	for (int k = 0; k < n; k++) {
 		if (seen.find(path2[k]) == seen.end()) {
 			not_seen.push(path2[k]);
 		}
 	}
+	
+	
 	for (int k = 0; k < i; k++) {
 		path[k] = not_seen.front();
 		not_seen.pop();
 	}
-	for (int k = i+1; k < n; k++) {
+
+	/*
+	cerr << "BBB " << i << " : ";
+	for (int k = 0; k < n; k++)
+		cerr << path[k] << " ";
+	cerr << endl;
+	*/
+
+
+
+	for (int k = j+1; k < n; k++) {
 		path[k] = not_seen.front();
 		not_seen.pop();
 	}
+	
+	/*
+	cerr << "CCC " << i << " : ";
+	for (int k = 0; k < n; k++)
+		cerr << path[k] << " ";
+	cerr << endl;
+	*/
+	
 	/* */
 	
 	
@@ -92,11 +120,7 @@ void genetic_solver::mutation(Path & path) {
 	int n = path.number_cities();
 	int i = uniform_int_distribution<int>(1, n-3)(generator);
 	int j = uniform_int_distribution<int>(i+1, n-2)(generator);
-	while (i < j) {
-		swap(path[i], path[j]);
-		i++;
-		j--;
-	}
+	path.reverse(i,j);
 }
 
 void genetic_solver::optimize() {
