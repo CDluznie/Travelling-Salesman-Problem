@@ -11,15 +11,15 @@ class Path {
 	
 public:
 
-	Path(vector<int> path_order); // Todo private ?
+	Path(const Map * map, vector<int> path_order);
 	
 	Path(const Path &path);
 
 	Path & operator=(const Path &path);
 	
-	static Path random(const Map & map); // TODO maybe in Map
+	static Path random(const Map * map);
 	
-	int distance() const; // TODO maybe in Solver
+	int distance() const;
 	
 	int number_cities() const;
 	
@@ -40,6 +40,8 @@ public:
 	friend ostream & operator<<(ostream & os, const Path & path);
 
 private :
+	
+	const Map * map;
 	
 	vector<int> path_order;
 

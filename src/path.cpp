@@ -5,11 +5,11 @@
 #include <set>
 #include <queue>
 
-Path::Path(vector<int> path_order) : path_order(path_order) {
+Path::Path(const Map * map, vector<int> path_order) : map(map), path_order(path_order) {
 		
 }
 
-Path::Path(const Path &path) : path_order(path.path_order) {
+Path::Path(const Path &path) : map(path.map), path_order(path.path_order) {
 	
 }
 
@@ -22,16 +22,20 @@ Path & Path::operator=(const Path &path) {
 	
 }
 
-Path Path::random(const Map & map) {
-	vector<int> path_order(map.number_cities());
+Path Path::random(const Map * map) {
+	vector<int> path_order(map->number_cities());
 	iota(path_order.begin(), path_order.end(), 0);
 	path_order.push_back(0);
 	shuffle(path_order.begin()+1, path_order.end()-1, mt19937{random_device{}()});
-	return Path(path_order);
+	return Path(map, path_order);
 }
 
 int Path::distance() const {
-	return 100; //TODO
+	int d = 0;
+	for (unsigned int i = 0; i < path_order.size()-1; i++) {
+		d += (*map)[path_order[i]].distance((*map)[path_order[i+1]]);
+	}
+	return d;
 }
 
 int Path::number_cities() const {
@@ -70,7 +74,7 @@ Path Path::crossing(int begin, int end, const Path & other) const {
 		new_path[i] = not_seen.front();
 		not_seen.pop();
 	}
-	return Path(new_path);
+	return Path(other.map, new_path);
 }
 
 int Path::operator[](int i) const {
