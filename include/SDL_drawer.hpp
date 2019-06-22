@@ -25,6 +25,8 @@ public:
 	
 	void draw_path(const Path & path) const override; 
 	
+	void draw_stats(const Path & path) const override; 
+	
 	void clean() const override;
 
 	void update() const override;

@@ -108,6 +108,10 @@ void SDL_drawer::draw_path(const Path & path) const {
 	draw_map();
 }
 
+void SDL_drawer::draw_stats(const Path & path) const {
+	cerr << path.distance() << endl;
+}
+
 bool SDL_drawer::stop() const {
 	SDL_Event event{};
 	bool stop = false;
