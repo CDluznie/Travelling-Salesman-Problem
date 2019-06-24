@@ -37,6 +37,8 @@ public:
 	
 	void write_JSON_file(string json_file_name) const;
 	
+	json map_to_JSON() const;
+	
 	friend ostream & operator<< (ostream & os, const Map & map);
 
 private :

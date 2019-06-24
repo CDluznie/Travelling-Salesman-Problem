@@ -64,17 +64,31 @@ Map Map::read_JSON_file(string json_file_name) {
 }
 
 Map Map::JSON_to_map(json json_map) {
-	//TODO
-	
-	int number_cities = 150;
-	int x_min = 100, x_max = 999;
-	int y_min = 100, y_max = 999;
-	
-	return Map::random(number_cities, x_min, x_max, y_min, y_max);
+	vector<City> cities;
+	for (const auto &it : json_map["cities"]) {
+		cities.push_back(City::JSON_to_city(it));
+	}
+	return Map(json_map["min_x"], json_map["max_x"], json_map["min_y"], json_map["max_y"], cities);
 }
 
 void Map::write_JSON_file(string json_file_name) const {
-	//TODO
+	ofstream json_file(json_file_name);
+	json_file << map_to_JSON().dump(4);
+	json_file.close();
+}
+
+json Map::map_to_JSON() const {
+	json json_map;
+	json json_cities;
+	for (City city : cities) {
+		json_cities.push_back(city.city_to_JSON());
+	}
+	json_map["min_x"] = min_x;
+	json_map["max_x"] = max_x;
+	json_map["min_y"] = min_y;
+	json_map["max_y"] = max_y;
+	json_map["cities"] = json_cities;
+	return json_map;
 }
 
 ostream & operator<< (ostream & os, const Map & map) {

@@ -19,12 +19,13 @@ int City::distance(const City & city) const {
 }
 
 City City::JSON_to_city(json json_city) {
-	return City(0,0); //TODO
+	return City(json_city["x"], json_city["y"]);
 }
 
 json City::city_to_JSON() const {
 	json json_city;
-	//TODO
+	json_city["x"] = x;
+	json_city["y"] = y;
 	return json_city;
 }
 
