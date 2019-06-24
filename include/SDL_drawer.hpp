@@ -19,7 +19,7 @@ public:
 	
 	~SDL_drawer();
 	
-	static SDL_drawer * create(int width, int height, const Map & map, int x_min, int x_max, int y_min, int y_max);
+	static SDL_drawer * create(int width, int height, const Map & map);
 	
 	void draw_map() const override;
 	

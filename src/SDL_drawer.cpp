@@ -34,7 +34,7 @@ SDL_drawer & SDL_drawer::operator=(const SDL_drawer &drawer) {
 	return *this;
 }
 
-SDL_drawer * SDL_drawer::create(int width, int height, const Map & map, int x_min, int x_max, int y_min, int y_max) {
+SDL_drawer * SDL_drawer::create(int width, int height, const Map & map) {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		throw std::runtime_error("SDL could not be initialized: " + string(SDL_GetError()));
 	}
@@ -54,14 +54,14 @@ SDL_drawer * SDL_drawer::create(int width, int height, const Map & map, int x_mi
 		throw std::runtime_error("Renderer could not be created: " + string(SDL_GetError()));
 	}
 	int border = 10;
-	// TODO lambda init
+	int x_min = map.x_min(), x_max = map.x_max();
+	int y_min = map.y_min(), y_max = map.y_max();
 	vector<int> positions_x;
 	vector<int> positions_y;
 	for (int i = 0; i < map.number_cities(); i++) {
 		positions_x.push_back(linear_scaling(map[i].getX(), x_min, x_max, border, width-border-1));
 		positions_y.push_back(linear_scaling(map[i].getY(), y_min, y_max, border, height-border-1));
 	}
-	//
 	SDL_drawer * drawer = new SDL_drawer(width, height, window, renderer, positions_x, positions_y);
 	drawer->clean();
 	return drawer;

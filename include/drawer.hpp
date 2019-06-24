@@ -24,7 +24,7 @@ public:
 	
 	virtual bool stop() const = 0;
 
-	static Drawer * new_SDL_drawer(int window_width, int window_height, const Map & map, int x_min, int x_max, int y_min, int y_max);
+	static Drawer * new_SDL_drawer(int window_width, int window_height, const Map & map);
 
 };
 
