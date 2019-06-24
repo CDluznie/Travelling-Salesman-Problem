@@ -109,7 +109,11 @@ void SDL_drawer::draw_path(const Path & path) const {
 }
 
 void SDL_drawer::draw_stats(const Path & path) const {
-	cerr << path.distance() << endl;
+	static int n = 0;
+	if (n == 0) {
+		cout << path.distance() << endl;
+	}
+	n = (n+1)%50;
 }
 
 bool SDL_drawer::stop() const {

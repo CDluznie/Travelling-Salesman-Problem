@@ -2,6 +2,7 @@
 
 Todo
 
-## Requirements
+## Dependencies
 
-* SDL2
+* SDL 2
+* JSON for Modern C++

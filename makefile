@@ -6,7 +6,7 @@ OBJDIR=obj
 
 CC=g++
 FLAGS=-std=c++14 -Wall -Wfatal-errors -Weffc++
-INC=-I./$(HEADER) -I/usr/include/SDL2
+INC=-I./$(HEADER) -I/usr/include/SDL2 -I./third-party/json3.0/include
 LIBDIR=
 LIBS=-lSDL2
 
