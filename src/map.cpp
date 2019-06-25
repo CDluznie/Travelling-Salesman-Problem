@@ -20,7 +20,7 @@ Map::Map(const Map &map) :
 	
 }
 
-Map Map::random(int n, int xmin, int xmax, int ymin, int ymax) {
+Map * Map::random(int n, int xmin, int xmax, int ymin, int ymax) {
 	vector<City> cities;
 	mt19937 generator(random_device{}());
 	uniform_int_distribution<int> distribution_x(xmin,xmax);
@@ -28,7 +28,7 @@ Map Map::random(int n, int xmin, int xmax, int ymin, int ymax) {
 	for (int i = 0; i < n; i++) {
 		cities.push_back(City(distribution_x(generator), distribution_y(generator)));
 	}	
-	return Map(xmin, xmax, ymin, ymax, cities);
+	return new Map(xmin, xmax, ymin, ymax, cities);
 }
 
 int Map::number_cities() const {
@@ -55,7 +55,7 @@ City Map::operator[](int i) const {
 	return cities[i];
 }
 
-Map Map::read_JSON_file(string json_file_name) {
+Map * Map::read_JSON_file(string json_file_name) {
 	json json_map;
 	ifstream json_file(json_file_name);
 	json_file >> json_map;
@@ -63,12 +63,12 @@ Map Map::read_JSON_file(string json_file_name) {
 	return JSON_to_map(json_map);
 }
 
-Map Map::JSON_to_map(json json_map) {
+Map * Map::JSON_to_map(json json_map) {
 	vector<City> cities;
 	for (const auto &it : json_map["cities"]) {
 		cities.push_back(City::JSON_to_city(it));
 	}
-	return Map(json_map["min_x"], json_map["max_x"], json_map["min_y"], json_map["max_y"], cities);
+	return new Map(json_map["min_x"], json_map["max_x"], json_map["min_y"], json_map["max_y"], cities);
 }
 
 void Map::write_JSON_file(string json_file_name) const {

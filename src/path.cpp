@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <set>
 #include <queue>
+#include <fstream>
 
 Path::Path(const Map * map, vector<int> path_order) : map(map), path_order(path_order) {
 		
@@ -75,6 +76,40 @@ Path Path::crossing(int begin, int end, const Path & other) const {
 		not_seen.pop();
 	}
 	return Path(other.map, new_path);
+}
+
+Path Path::read_JSON_file(string json_file_name) {
+	json json_path;
+	ifstream json_file(json_file_name);
+	json_file >> json_path;
+	json_file.close();
+	return JSON_to_path(json_path);
+}
+	
+Path Path::JSON_to_path(json json_path) {
+	Map * map = Map::JSON_to_map(json_path["map"]);
+	vector<int> path_order;
+	for (const auto &it : json_path["path_order"]) {
+		path_order.push_back(it);
+	}
+	return Path(map, path_order);
+}
+
+void Path::write_JSON_file(string json_file_name) const {
+	ofstream json_file(json_file_name);
+	json_file << path_to_JSON().dump(4);
+	json_file.close();
+}
+	
+json Path::path_to_JSON() const {
+	json json_path;
+	json json_path_order;
+	for (int i : path_order) {
+		json_path_order.push_back(i);
+	}
+	json_path["map"] = map->map_to_JSON();
+	json_path["path_order"] = path_order;
+	return json_path;
 }
 
 int Path::operator[](int i) const {

@@ -17,7 +17,7 @@ public:
 	
 	Map(const Map &map);
 	
-	static Map random(int n, int xmin, int xmax, int ymin, int ymax);
+	static Map * random(int n, int xmin, int xmax, int ymin, int ymax);
 	
 	int number_cities() const;
 	
@@ -31,9 +31,9 @@ public:
 	
 	City operator[](int i) const;
 	
-	static Map read_JSON_file(string json_file_name);
+	static Map * read_JSON_file(string json_file_name);
 	
-	static Map JSON_to_map(json json_map);
+	static Map * JSON_to_map(json json_map);
 	
 	void write_JSON_file(string json_file_name) const;
 	

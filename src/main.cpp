@@ -20,13 +20,8 @@ Path solve_travelling_salesman(Solver * solver, Drawer * drawer) {
 
 int main() {
 	
-	/*
-	json jsonFigure;
-	ifstream fichierFigure(fichier);
-	fichierFigure >> jsonFigure;
-	fichierFigure.close();
-	*/
-	
+	// TODO argv
+
 	bool random = false;
 
 	Map * map = nullptr;
@@ -38,11 +33,11 @@ int main() {
 		
 		int number_cities = 150;
 		
-		map = new Map(Map::random(number_cities, x_min, x_max, y_min, y_max));
+		map = Map::random(number_cities, x_min, x_max, y_min, y_max);
 
 	} else {
 	
-		map = new Map(Map::read_JSON_file("data/map.json"));
+		map = Map::read_JSON_file("data/map/map.json");
 	
 	}
 	
@@ -54,6 +49,8 @@ int main() {
 	Drawer * drawer = Drawer::new_SDL_drawer(900, 650, *map);
 	
 	Path solution = solve_travelling_salesman(solver, drawer);
+	
+	solution.write_JSON_file("data/solution/path.json");
 	
 	delete map;
 	delete solver;
