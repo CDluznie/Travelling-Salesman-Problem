@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
 	
 	try {
 
-		TCLAP::CmdLine cmd("Travelling salesman problem solver", ' ', "0.9");
+		TCLAP::CmdLine cmd("Travelling salesman problem solver", ' ', "1.0");
 		
 		TCLAP::ValueArg<string> output_arg("o", "output", "Output file name for the solution path", true, "", "path");
 		TCLAP::ValueArg<int> random_arg("r", "random", "Solve the problem on a random map with the specified number of cities", true, 0, "int");
