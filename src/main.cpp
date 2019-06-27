@@ -11,7 +11,6 @@ Path solve_travelling_salesman(Solver * solver, Drawer * drawer) {
 	while (!drawer->stop()) {
 		drawer->clean();
 		drawer->draw_path(solution);
-		drawer->draw_stats(solution);
 		drawer->update();
 		solver->optimize();
 		solution = solver->get_solution();

@@ -16,8 +16,6 @@ public:
 	
 	virtual void draw_path(const Path & path) const = 0; 
 	
-	virtual void draw_stats(const Path & path) const = 0; 
-	
 	virtual void clean() const = 0;
 
 	virtual void update() const = 0;
